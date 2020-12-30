@@ -162,6 +162,14 @@ app.delete('/files/:id', (req,res) => {
   });
 });
 
+// use this function and require it in controllers
+// add function from controller to router but add getGfs() in controller
+// this is to avoid the circular dependency issue (fileA = require from file b and vice versa)
+ /* exports.getGfs = () => {
+  return gfs;
+}
+*/
+
 const port = 5000 || process.env.PORT;
 
 app.listen(port, () => console.log(`Server started running on port ${port}`));
