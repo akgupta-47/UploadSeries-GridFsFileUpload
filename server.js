@@ -71,7 +71,19 @@ const upload = multer({ storage });
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-    res.render('index');
+  gfs.files.find().toArray((err, files) => {
+    if( !files || files.length === 0){
+        res.render('index', {files: false});
+    }else{
+     files.map(file => {
+       if(file.contentType.split('/')[0] === 'image'){
+         file.isImage = true;
+       }else{
+         file.isImage = false;
+       }
+     })
+    }
+});
 });
 
 // @route POST /upload , upload files to db
@@ -97,7 +109,7 @@ app.get('/files', (req, res) => {
 
         // Files exist
         return res.json(files);
-    })
+    });
 });
 
 app.get('/files/:filename', (req, res) => {
@@ -108,7 +120,32 @@ app.get('/files/:filename', (req, res) => {
                 err: 'No files exist'
             });
         }
+        // Files exist
+        return res.json(file);
     });
+});
+
+// @route post ,display image
+app.get('/image/:filename', (req, res) => {
+  // toArray function asks for a callback function
+  gfs.files.findOne({filename: req.params.filename}, (err, file) => {
+      if( !file || file.length === 0){
+          return res.status(404).json({
+              err: 'No files exist'
+          });
+      }
+      // Files exist
+      // check if image image/jpeg, image/png
+      if(file.contentType.split('/')[0] === 'image'){
+        // Read output to browser
+        const readstream = gfs.createReadStream(file.filename);
+        readstream.pipe(res);
+      }else{
+        res.status(404).json({
+          err: 'Not an image'
+        });
+      }
+  });
 });
 
 const port = 5000 || process.env.PORT;
