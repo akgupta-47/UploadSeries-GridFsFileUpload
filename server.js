@@ -73,15 +73,19 @@ app.set('view engine', 'ejs');
 app.get('/', (req, res) => {
   gfs.files.find().toArray((err, files) => {
     if( !files || files.length === 0){
-        res.render('index', {files: false});
-    }else{
-     files.map(file => {
-       if(file.contentType.split('/')[0] === 'image'){
-         file.isImage = true;
-       }else{
-         file.isImage = false;
-       }
-     })
+      res.render('index', {files: false});
+    }
+    else{
+      files.map(file => {
+        // if image then only set the image property true
+        if(file.contentType.split('/')[0] === 'image'){
+          file.isImage = true;
+        }else{
+          file.isImage = false;
+        }
+      });
+      // { files } === {files : files}
+      res.render('index', { files });
     }
 });
 });
@@ -145,6 +149,16 @@ app.get('/image/:filename', (req, res) => {
           err: 'Not an image'
         });
       }
+  });
+});
+
+app.delete('/files/:id', (req,res) => {
+  // the (root : collection name)
+  gfs.remove({_id: req.params.id, root: 'uploads'}, (err, gridStore) => {
+    if (err){
+      return res.status(404).json({err:err});
+    }
+    res.redirect('/');
   });
 });
 

@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <style>
+      img {
+        width: 100%;
+      }
+    </style>
     <title>MongoFile Upload</title>
 </head>
 <body>
@@ -18,6 +23,24 @@
               <input type="submit" value="Submit" class="btn btn-primary btn-block">
             </form>
             <hr>
+            <!-- ctrl k c -->
+            <!-- ejs, ejsout, ejsif, ejselse, ejsfor, ejseach -->
+            <% if (files) { %>
+                <% files.forEach(file => { %>
+                  <div class="card card-body mb-3">
+                    <% if (file.isImage) { %>
+                     <img src="image/<%= file.filename %> " alt="">
+                    <% } else { %>
+                      <%= file.filename %>
+                    <% } %> 
+                    <form method="POST" action="/files/<%= file._id %>?_method=DELETE ">
+                      <button class="btn btn-danger btn-block mt-4">Delete</button>
+                    </form>
+                  </div>
+                <% }) %>
+            <% } else { %>
+              <p>No files to show</p>
+            <% } %> 
             </div>
         </div>
     </div>
